@@ -1,0 +1,25 @@
+{
+  "name": "node-red-contrib-sms-gateway",
+  "version": "1.0.0",
+  "description": "Node-RED nodes for SMS Gateway API",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sci-Project-team/nodered-plugin.git"
+  },
+  "node-red": {
+    "nodes": {
+      "sms-gateway": "sms-gateway.js"
+    }
+  },
+  "keywords": [
+    "node-red",
+    "sms",
+    "gateway"
+  ],
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

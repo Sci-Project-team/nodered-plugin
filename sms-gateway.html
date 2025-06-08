@@ -1,0 +1,261 @@
+<script type="text/javascript">
+  RED.nodes.registerType("sms-gateway-config", {
+    category: "config",
+    defaults: {
+      name: { value: "" },
+      baseUrl: { value: "http://localhost:8000", required: true },
+    },
+    credentials: {
+      apiKey: { type: "password", required: true },
+    },
+    label: function () {
+      return this.name || this.baseUrl;
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="sms-gateway-config">
+  <div class="form-row">
+    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input
+      type="text"
+      id="node-config-input-name"
+      placeholder="SMS Gateway Config" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-baseUrl"
+      ><i class="fa fa-server"></i> Base URL</label
+    >
+    <input
+      type="text"
+      id="node-config-input-baseUrl"
+      placeholder="http://localhost:8000" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-config-input-apiKey"
+      ><i class="fa fa-key"></i> API Key</label
+    >
+    <input
+      type="password"
+      id="node-config-input-apiKey"
+      placeholder="Enter your API key" />
+    <div class="form-tips">
+      <b>Tip:</b> Get your API key from your SMS gateway frontend/dashboard
+    </div>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="sms-gateway-config">
+  <p>Configuration node for SMS Gateway connection.</p>
+  <p>Configure the base URL and API key for your FastAPI SMS gateway.</p>
+  <h3>Getting Your API Key</h3>
+  <ol>
+    <li>Go to your SMS gateway frontend/dashboard</li>
+    <li>Navigate to API keys or Settings section</li>
+    <li>Generate or copy your API key</li>
+    <li>Paste it in the API Key field above</li>
+  </ol>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("sms-gateway", {
+    category: "communication",
+    color: "#3FADB5",
+    defaults: {
+      name: { value: "" },
+      config: { value: "", type: "sms-gateway-config", required: true },
+      operation: { value: "send" },
+      phoneNumber: { value: "" },
+      message: { value: "" },
+      limit: { value: 50, validate: RED.validators.number() },
+      logLevel: { value: "" },
+      component: { value: "" },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "envelope.png",
+    label: function () {
+      return this.name || "SMS " + this.operation;
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      $("#node-input-operation").change(function () {
+        const operation = $(this).val();
+
+        // Show/hide relevant fields based on operation
+        $(".form-row").hide();
+        $(".form-row.always-show").show();
+
+        if (operation === "send" || operation === "simulate-receive") {
+          $(".form-row.phone-message").show();
+        } else if (operation === "inbox" || operation === "sent") {
+          $(".form-row.limit").show();
+        } else if (operation === "logs") {
+          $(".form-row.limit, .form-row.log-filters").show();
+        }
+      });
+
+      // Trigger change event to set initial visibility
+      $("#node-input-operation").trigger("change");
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="sms-gateway">
+  <div class="form-row always-show">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+
+  <div class="form-row always-show">
+    <label for="node-input-config"
+      ><i class="fa fa-cog"></i> Configuration</label
+    >
+    <input type="text" id="node-input-config" />
+  </div>
+
+  <div class="form-row always-show">
+    <label for="node-input-operation"
+      ><i class="fa fa-tasks"></i> Operation</label
+    >
+    <select id="node-input-operation">
+      <option value="send">Send SMS</option>
+      <option value="inbox">Get Inbox</option>
+      <option value="sent">Get Sent Messages</option>
+      <option value="logs">Get Logs</option>
+      <option value="simulate-receive">Simulate Receive</option>
+    </select>
+  </div>
+
+  <div class="form-row phone-message">
+    <label for="node-input-phoneNumber"
+      ><i class="fa fa-phone"></i> Phone Number</label
+    >
+    <input type="text" id="node-input-phoneNumber" placeholder="+1234567890" />
+  </div>
+
+  <div class="form-row phone-message">
+    <label for="node-input-message"
+      ><i class="fa fa-comment"></i> Message</label
+    >
+    <textarea
+      id="node-input-message"
+      placeholder="SMS message content"
+      rows="3"></textarea>
+  </div>
+
+  <div class="form-row limit">
+    <label for="node-input-limit"><i class="fa fa-list"></i> Limit</label>
+    <input
+      type="number"
+      id="node-input-limit"
+      placeholder="50"
+      min="1"
+      max="1000" />
+  </div>
+
+  <div class="form-row log-filters">
+    <label for="node-input-logLevel"
+      ><i class="fa fa-filter"></i> Log Level</label
+    >
+    <select id="node-input-logLevel">
+      <option value="">All Levels</option>
+      <option value="INFO">INFO</option>
+      <option value="WARNING">WARNING</option>
+      <option value="ERROR">ERROR</option>
+      <option value="DEBUG">DEBUG</option>
+    </select>
+  </div>
+
+  <div class="form-row log-filters">
+    <label for="node-input-component"
+      ><i class="fa fa-cube"></i> Component</label
+    >
+    <input
+      type="text"
+      id="node-input-component"
+      placeholder="Filter by component" />
+  </div>
+</script>
+
+<script type="text/html" data-help-name="sms-gateway">
+  <p>
+    SMS Gateway node that connects to your FastAPI SMS service using API key
+    authentication.
+  </p>
+
+  <h3>Configuration</h3>
+  <p>
+    First create an SMS Gateway Configuration with your FastAPI base URL and API
+    key.
+  </p>
+
+  <h3>Getting Your API Key</h3>
+  <ol>
+    <li>Go to your SMS gateway frontend/dashboard</li>
+    <li>Find the API keys or Settings section</li>
+    <li>Generate or copy your API key</li>
+    <li>Use it in the configuration</li>
+  </ol>
+
+  <h3>Operations</h3>
+  <dl class="message-properties">
+    <dt>Send SMS</dt>
+    <dd>Sends an SMS to a specified phone number via your FastAPI service</dd>
+
+    <dt>Get Inbox</dt>
+    <dd>Retrieves received SMS messages from your service</dd>
+
+    <dt>Get Sent Messages</dt>
+    <dd>Retrieves sent SMS messages from your service</dd>
+
+    <dt>Get Logs</dt>
+    <dd>Retrieves system logs with optional filtering</dd>
+
+    <dt>Simulate Receive</dt>
+    <dd>Simulates receiving an SMS through your service</dd>
+  </dl>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>msg.operation <span class="property-type">string</span></dt>
+    <dd>Override the configured operation</dd>
+
+    <dt>msg.phoneNumber <span class="property-type">string</span></dt>
+    <dd>Phone number (for send/simulate operations)</dd>
+
+    <dt>msg.message <span class="property-type">string</span></dt>
+    <dd>Message content (for send/simulate operations)</dd>
+
+    <dt>msg.limit <span class="property-type">number</span></dt>
+    <dd>Maximum number of items to return</dd>
+
+    <dt>msg.logLevel <span class="property-type">string</span></dt>
+    <dd>Filter logs by level (INFO, WARNING, ERROR, DEBUG)</dd>
+
+    <dt>msg.component <span class="property-type">string</span></dt>
+    <dd>Filter logs by component name</dd>
+  </dl>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>msg.payload <span class="property-type">object|array</span></dt>
+    <dd>The result from your FastAPI SMS service</dd>
+  </dl>
+
+  <h3>Details</h3>
+  <p>
+    This node makes HTTP requests to your FastAPI SMS gateway service using API
+    key authentication. It provides comprehensive error reporting and automatic
+    connection testing.
+  </p>
+
+  <p>
+    The node will automatically test the connection when deployed and show the
+    connection status.
+  </p>
+</script>
