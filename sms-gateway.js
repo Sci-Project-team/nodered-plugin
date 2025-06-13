@@ -1,7 +1,7 @@
 // sms-gateway.js - Node-RED SMS Gateway Plugin (API Key Authentication)
 module.exports = function (RED) {
   "use strict";
-  const axios = require("./node_modules/axios/index.d.cts");
+  const { RawAxiosHeaders } = require("axios");
 
   // SMS Gateway Configuration Node
   function SmsGatewayConfigNode(config) {
@@ -116,20 +116,12 @@ module.exports = function (RED) {
         return await makeApiCall("GET", "/sms/sent", null, { limit });
       },
 
-      async logs(limit = 100, level = null, component = null) {
-        const params = { limit };
-        if (level) params.level = level;
-        if (component) params.component = component;
-
-        return await makeApiCall("GET", "/logs", null, params);
-      },
-
-      async simulateReceive(phoneNumber, message) {
-        return await makeApiCall("POST", "/sms/simulate-receive", null, {
-          phone_number: phoneNumber,
-          message: message,
-        });
-      },
+      // async simulateReceive(phoneNumber, message) {
+      //   return await makeApiCall("POST", "/sms/simulate-receive", null, {
+      //     phone_number: phoneNumber,
+      //     message: message,
+      //   });
+      // },
     };
 
     // Node input handler
@@ -197,45 +189,45 @@ module.exports = function (RED) {
             });
             break;
 
-          case "logs":
-            const logLimit = msg.limit || node.limit || 100;
-            const logLevel = msg.logLevel || node.logLevel || null;
-            const component = msg.component || node.component || null;
+          // case "logs":
+          //   const logLimit = msg.limit || node.limit || 100;
+          //   const logLevel = msg.logLevel || node.logLevel || null;
+          //   const component = msg.component || node.component || null;
 
-            result = await operations.logs(logLimit, logLevel, component);
-            msg.payload = result;
-            node.status({
-              fill: "green",
-              shape: "dot",
-              text: `${result.length} logs`,
-            });
-            break;
+          //   result = await operations.logs(logLimit, logLevel, component);
+          //   msg.payload = result;
+          //   node.status({
+          //     fill: "green",
+          //     shape: "dot",
+          //     text: `${result.length} logs`,
+          //   });
+          //   break;
 
-          case "simulate-receive":
-            const fromNumber =
-              msg.phoneNumber ||
-              node.phoneNumber ||
-              msg.payload?.phoneNumber ||
-              msg.payload?.phone_number;
-            const receivedMessage =
-              msg.message ||
-              node.message ||
-              msg.payload?.message ||
-              (typeof msg.payload === "string" ? msg.payload : "");
+          // case "simulate-receive":
+          //   const fromNumber =
+          //     msg.phoneNumber ||
+          //     node.phoneNumber ||
+          //     msg.payload?.phoneNumber ||
+          //     msg.payload?.phone_number;
+          //   const receivedMessage =
+          //     msg.message ||
+          //     node.message ||
+          //     msg.payload?.message ||
+          //     (typeof msg.payload === "string" ? msg.payload : "");
 
-            if (!fromNumber || !receivedMessage) {
-              throw new Error(
-                "Phone number and message are required for simulating received SMS"
-              );
-            }
+          //   if (!fromNumber || !receivedMessage) {
+          //     throw new Error(
+          //       "Phone number and message are required for simulating received SMS"
+          //     );
+          //   }
 
-            result = await operations.simulateReceive(
-              fromNumber,
-              receivedMessage
-            );
-            msg.payload = result;
-            node.status({ fill: "green", shape: "dot", text: "SMS simulated" });
-            break;
+          //   result = await operations.simulateReceive(
+          //     fromNumber,
+          //     receivedMessage
+          //   );
+          //   msg.payload = result;
+          //   node.status({ fill: "green", shape: "dot", text: "SMS simulated" });
+          //   break;
 
           default:
             throw new Error(`Unknown operation: ${operation}`);

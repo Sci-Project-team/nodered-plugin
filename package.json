@@ -20,6 +20,6 @@
     "gateway"
   ],
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.9.0"
   }
 }
