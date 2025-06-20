@@ -1,8 +1,8 @@
 // sms-gateway.js - Node-RED SMS Gateway Plugin (API Key Authentication)
 module.exports = function (RED) {
   "use strict";
+  const axios = require("axios");
   const { RawAxiosHeaders } = require("axios");
-
   // SMS Gateway Configuration Node
   function SmsGatewayConfigNode(config) {
     RED.nodes.createNode(this, config);
