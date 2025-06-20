@@ -7,34 +7,46 @@ A Node-RED plugin that provides SMS functionality through integration with a Fas
 - **Send SMS Messages** - Send text messages to phone numbers
 - **Retrieve Inbox** - Get received SMS messages
 - **View Sent Messages** - Access sent message history
-- **System Logs** - Retrieve and filter system logs
-- **Simulate Receive** - Test incoming SMS functionality
 - **Secure Authentication** - API key-based authentication
 - **Connection Testing** - Automatic connection verification
 - **Error Handling** - Comprehensive error reporting and status updates
 
 ## Installation
 
-### Method 1: Node-RED Palette Manager
+### Method 1: Install from GitHub Release (Recommended)
 
-1. Open Node-RED in your browser
-2. Go to **Menu** → **Manage Palette**
-3. Click the **Install** tab
-4. Search for "node-red-contrib-sms-gateway"
-5. Click **Install**
+1. **Download the latest release**:
 
-### Method 2: npm Install
+   - Go to the [releases page](https://github.com/your-username/node-red-contrib-sms-gateway/releases)
+   - Download the latest `.zip` or `.tar.gz` file
 
-```bash
-cd ~/.node-red
-npm install node-red-contrib-sms-gateway
-```
+2. **Extract the archive**:
 
-### Method 3: Manual Installation
+   ```bash
+   # For zip files
+   unzip node-red-contrib-sms-gateway-v1.0.0.zip
 
-1. Copy the plugin files to your Node-RED user directory:
-   - `~/.node-red/node_modules/node-red-contrib-sms-gateway/`
-2. Restart Node-RED
+   # For tar.gz files
+   tar -xzf node-red-contrib-sms-gateway-v1.0.0.tar.gz
+   ```
+
+3. **Install globally using npm**:
+
+   ```bash
+   cd node-red-contrib-sms-gateway
+   npm install -g .
+   ```
+
+4. **Restart Node-RED** to load the new plugin
+
+### Method 2: Manual Installation
+
+1. Download and extract the latest release
+2. Copy the plugin files to your Node-RED user directory:
+   ```bash
+   cp -r node-red-contrib-sms-gateway ~/.node-red/node_modules/
+   ```
+3. Restart Node-RED
 
 ## Prerequisites
 
@@ -91,19 +103,15 @@ Configure the SMS Gateway node:
 - **Send SMS**: Send a text message to a phone number
 - **Get Inbox**: Retrieve received messages
 - **Get Sent Messages**: Retrieve sent message history
-- **Get Logs**: Fetch system logs with optional filtering
-- **Simulate Receive**: Test incoming SMS functionality
 
 #### Input Fields
 
 - **Name**: Node identifier
 - **Configuration**: Reference to SMS Gateway config
 - **Operation**: Selected operation type
-- **Phone Number**: Target phone number (for send/simulate)
-- **Message**: SMS content (for send/simulate)
-- **Limit**: Maximum results to return (for inbox/sent/logs)
-- **Log Level**: Filter logs by level (INFO, WARNING, ERROR, DEBUG)
-- **Component**: Filter logs by component name
+- **Phone Number**: Target phone number (for send)
+- **Message**: SMS content (for send)
+- **Limit**: Maximum results to return (for inbox/sent)
 
 ## Message Properties
 
@@ -116,8 +124,6 @@ msg.operation = "send"; // Override operation
 msg.phoneNumber = "+1234567890"; // Phone number
 msg.message = "Hello World!"; // Message content
 msg.limit = 100; // Result limit
-msg.logLevel = "ERROR"; // Log level filter
-msg.component = "sms_service"; // Component filter
 ```
 
 ### Output Message Properties
@@ -126,8 +132,6 @@ The node outputs results in `msg.payload`:
 
 - **Send SMS**: Confirmation object with message ID and status
 - **Inbox/Sent**: Array of message objects
-- **Logs**: Array of log entry objects
-- **Simulate**: Confirmation of simulated message
 
 ## Usage Examples
 
@@ -165,14 +169,6 @@ Configure SMS Gateway:
 Switch node condition: `msg.payload > 30`
 Template node: `Alert: Temperature is {{payload}}°C`
 
-### 4. Log Monitoring
-
-```
-[inject] → [SMS Gateway] → [function] → [debug]
-```
-
-Configure for logs operation with ERROR level filtering.
-
 ## API Endpoints
 
 The plugin communicates with these FastAPI endpoints:
@@ -180,8 +176,6 @@ The plugin communicates with these FastAPI endpoints:
 - `POST /sms` - Send SMS
 - `GET /sms/inbox` - Get received messages
 - `GET /sms/sent` - Get sent messages
-- `GET /logs` - Get system logs
-- `POST /sms/simulate-receive` - Simulate received SMS
 
 ## Error Handling
 
@@ -276,4 +270,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-For more information and updates, visit the [project repository](https://github.com/your-username/node-red-contrib-sms-gateway).
+For more information and updates, visit the [project repository](https://github.com/Sci-Project-team/nodered-plugin).
